@@ -1,0 +1,74 @@
+version: '3.8'
+
+networks:
+  bitrixdock:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      # Прокинутый порт в свою локальную систему (в контейнерах использовать 80)
+      - ${PORT_NGINX_LOCAL}:80
+    volumes:
+      # Брать файл конфигурации nginx из своей файловой системы (ro - read only)
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      # Общая папка проекта в своей файловой системе
+      - ./src:${SITE_PATH}
+
+    # Зависимости контейнера
+    # При запуске контейнера, автоматически будут запущены контейнеры mysql и php
+    depends_on:
+      - mysql
+      - phpmyadmin
+      - php
+    networks:
+      - bitrixdock
+
+  php:
+    build:
+      context: dockerfiles
+      dockerfile: php.Dockerfile
+    volumes:
+      # Общая папка проекта в своей файловой системе
+      - ./src:${SITE_PATH}
+      # Файл конфигурации php
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      # Сохранение файлов сессий в своей файловой системе
+      - ./dbdata/sessions/:/var/bitrix/sessions/
+    networks:
+      - bitrixdock
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      # Прокинутый порт в свою локальную систему (в контейнерах использовать 3306)
+      - ${PORT_MYSQL_LOCAL}:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      # Записывать данные базы данных в свою файловую систему для сохранения
+      - ./dbdata/mysql:/var/lib/mysql
+    networks:
+      - bitrixdock
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.0
+    restart: always
+    ports:
+      # Прокинутый порт в свою локальную систему (в контейнерах использовать 80)
+      - ${PORT_PHPMYADMIN_LOCAL}:80
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - mysql
+    networks:
+      - bitrixdock

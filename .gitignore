@@ -1,0 +1,7 @@
+.idea
+.vscode
+.fleet
+logs
+dbdata/mysql/*
+dbdata/sessions/*
+.env
