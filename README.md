@@ -28,7 +28,6 @@ phpMyAdmin http://localhost:8001/
 
 [хороший аналог](https://github.com/bitrixdock/bitrixdock/tree/master)
 
----
 
 # Команды
 
@@ -45,7 +44,6 @@ phpMyAdmin http://localhost:8001/
 
 `sudo docker-compose up -d nginx`
 
----
 
 ### Остановить
 
@@ -58,25 +56,21 @@ phpMyAdmin http://localhost:8001/
 
 `sudo docker-compose down -v`
 
----
 
 ### Логи
 
 `sudo docker-compose logs mysql`
 
----
 
 ### Изменять права доступа для проекта на текущего пользователя в текущей папки
 
 `sudo chown -R $USER:$USER .`
 
----
 
 ### Изменить права доступа для папки storage в проекте
 
 `sudo chmod -R 777 src`
 
----
 
 ## MySQL
 В локальной системе порт 3306, в контейнерах 3306
