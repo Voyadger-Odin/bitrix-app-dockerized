@@ -11,9 +11,9 @@ services:
       - ${PORT_NGINX_LOCAL}:80
     volumes:
       # Брать файл конфигурации nginx из своей файловой системы (ro - read only)
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./config/nginx/conf.d/:/etc/nginx/conf.d/
       # Общая папка проекта в своей файловой системе
-      - ./src:${SITE_PATH}
+      - ${SITE_LOCAL_PATH}:${SITE_PATH}
 
     # Зависимости контейнера
     # При запуске контейнера, автоматически будут запущены контейнеры mysql и php
@@ -30,9 +30,9 @@ services:
       dockerfile: php.Dockerfile
     volumes:
       # Общая папка проекта в своей файловой системе
-      - ./src:${SITE_PATH}
+      - ${SITE_LOCAL_PATH}:${SITE_PATH}
       # Файл конфигурации php
-      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
       # Сохранение файлов сессий в своей файловой системе
       - ./dbdata/sessions/:/var/bitrix/sessions/
     networks:
@@ -56,6 +56,8 @@ services:
     stdin_open: true
     tty: true
     restart: unless-stopped
+
+  #----------------------- Административные контейнеры -----------------------
 
   phpmyadmin:
     image: phpmyadmin:5.2.0
